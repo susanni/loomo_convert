@@ -67,9 +67,6 @@ class ConverterNode(object):
 		cv_image = cv_temp.copy()  # Have to copy so the numpy array is writeable (can check with cv_image_copy.flags)
 		kernel = np.ones((5,5), np.uint8)
 		cv_image = cv2.morphologyEx(cv_image, cv2.MORPH_OPEN, kernel)  # Using erosion/dilation to get rid of noise in the depth cloud
-		row = 100
-		#cv_image[-row:, :] = cv_image[-row+1]  # extrapolate the section detecting the floor
-		#cv_image[:row, :] = cv_image[row]  # extrapolate the section detecting the ceiling
 		new_image = self.bridge.cv2_to_imgmsg(cv_image, encoding="passthrough")  # convert back to ROS image
 		
 		image.encoding = "16UC1"
