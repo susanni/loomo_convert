@@ -22,5 +22,9 @@ Notes:
     ```cpp
       if (image_msg->encoding == "16UC1" || image_msg->encoding == "mono16")
     ```
+  * If camera sets out-of-range values to 0 instead of NaN or Inf, in `DepthImageCallback` (around line 646) add:
+    ```cpp
+      else if (depth == 0) { continue; }  // don't add points to pointcloud if value/depth is 0
+    ```
     
 
