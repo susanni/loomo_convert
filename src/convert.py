@@ -65,9 +65,8 @@ class ConverterNode(object):
 	def depth_image_callback(self, image):
 		cv_temp = self.bridge.imgmsg_to_cv2(image, desired_encoding="passthrough")  # convert to CV image for editting
 		cv_image = cv_temp.copy()  # Have to copy so the numpy array is writeable (can check with cv_image_copy.flags)
-		#cv_image = cv2.medianBlur(cv_image, 5)  # median filter to get rid of noise
 		kernel = np.ones((5,5), np.uint8)
-		#cv_image = cv2.morphologyEx(cv_image, cv2.MORPH_OPEN, kernel)
+		cv_image = cv2.morphologyEx(cv_image, cv2.MORPH_OPEN, kernel)  # Using erosion/dilation to get rid of noise in the depth cloud
 		row = 100
 		#cv_image[-row:, :] = cv_image[-row+1]  # extrapolate the section detecting the floor
 		#cv_image[:row, :] = cv_image[row]  # extrapolate the section detecting the ceiling
@@ -76,8 +75,6 @@ class ConverterNode(object):
 		image.encoding = "16UC1"
 		image.data = new_image.data
 		self.depth_image_pub.publish(image)
-		#cv_image = self.bridge.imgmsg_to_cv2(image, desired_encoding="passthrough")
-		#print("DISTANCE: " + str(cv_image[120, 160]) + ", " + str(cv_image[10,10]))
 
 	def camera_info_callback(self, camera_info):
 		camera_info.distortion_model = "plumb_bob"
