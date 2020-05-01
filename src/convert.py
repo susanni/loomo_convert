@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import rospy
 import tf
-from geometry_msgs.msg import PoseStamped
+from geometry_msgs.msg import PoseStamped, PolygonStamped, Polygon, Point32
 from nav_msgs.msg import Odometry
 from snapstack_msgs.msg import State
 
@@ -17,8 +17,9 @@ class ConverterNode(object):
 		self.use_amcl = rospy.get_param("~use_amcl")
 		if not self.use_amcl:
 			self.listener = tf.TransformListener()
-		# Only useful when not using AMCL
+		# Only publishing when not using AMCL
 		self.new_pose_pub = rospy.Publisher("~new_pose_topic", PoseStamped, queue_size=1)
+		self.footprint_pub = rospy.Publisher("~footprint_topic", PolygonStamped, queue_size=1)
 
 		# Pose message to Odom messgae
 		self.pose_sub = rospy.Subscriber("~pose_topic", PoseStamped, self.pose_callback)
@@ -41,8 +42,24 @@ class ConverterNode(object):
 		Uses a pose message to generate an odometry and state message.
 		:param pose_msg: (geometry_msgs/PoseStamped) pose message
 		'''
-		if not self.use_amcl:
-			pose_msg = self.tf_to_pose("LO01_base_link", "map", pose_msg.header)
+		new_pose_msg, trans, rot = self.tf_to_pose("LO01_base_link", "map", pose_msg.header)
+		if not self.use_amcl and trans and rot:  # if not getting tf, trans and rot will be None
+			pose_msg = new_pose_msg
+			self.new_pose_pub.publish(pose_msg)
+
+			footprint = PolygonStamped()
+			footprint.header = pose_msg.header  # has same frame_id (map) and time stamp
+			loomo_points = np.array([[0.16, -0.31],
+						[ 0.16,  0.31],
+						[-0.16,  0.31],
+						[-0.16, -0.31]])
+			roll, pitch, yaw = tf.transformations.euler_from_quaternion(rot)
+			rot = np.array([[np.cos(yaw), -np.sin(yaw)], [np.sin(yaw), np.cos(yaw)]])
+			rotated_points = np.matmul(rot,loomo_points.T)  # 2x4 array
+			rot_and_trans = rotated_points + np.array([[trans[0]], [trans[1]]])
+			polygon = Polygon(points=[Point32(x=x, y=y, z=0) for x, y in rot_and_trans.T])
+			footprint.polygon = polygon
+			self.footprint_pub.publish(footprint)
 
 		odom_msg = Odometry()
 		odom_msg.pose.pose = pose_msg.pose
@@ -61,8 +78,6 @@ class ConverterNode(object):
 
 		self.state_pub.publish(state_msg)
 
-		self.new_pose_pub.publish(pose_msg)  # Only unique from other pose topic when not using AMCL
-
 	def tf_to_pose(self, source_frame, target_frame, header):
 		'''
 		Listening to transform and converting to Pose message.
@@ -70,8 +85,12 @@ class ConverterNode(object):
 		:param target_frame: (string) target frame of tf
 		:param header: (std_msgs/Header) header for new pose message
 		:return: (geometry_msgs/PoseStamped) pose message from tf
+		         (tuple) translation
+		         (tuple) rotation
 		'''
 		pose_msg = PoseStamped()
+		trans = None
+		rot = None
 		try:
 			trans, rot = self.listener.lookupTransform(target_frame, source_frame, rospy.Time(0))
 			pose_msg.header = header
@@ -85,7 +104,7 @@ class ConverterNode(object):
 
 		except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException) as e:
 			print("NOT GETTING TF: " + str(e))
-		return pose_msg
+		return pose_msg, trans, rot
 
 	def depth_image_callback(self, image):
 		'''
