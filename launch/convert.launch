@@ -1,5 +1,6 @@
 <launch>
 	<arg name="ns" default="LO01" />
+	<arg name="use_amcl" default="false" />
 	<param name="/use_sim_time" value="true" />
 
 	<node pkg="tf" type="static_transform_publisher" name="tf_world_map" args="0 0 0 0 0 0 world map 10" />
@@ -8,6 +9,7 @@
 
 	<!-- Publishing Odometry based on pose topic -->
 	<node name="loomo_convert" pkg="loomo_convert" type="convert.py" output="screen" ns="$(arg ns)">
+		<param name="~use_amcl" type="bool" value="$(arg use_amcl)" />
 		<remap from="~pose_topic" to="pose" />
 		<remap from="~odom_topic" to="odom" />
 		<remap from="~state_topic" to="state" />
