@@ -11,6 +11,7 @@
 	<node name="loomo_convert" pkg="loomo_convert" type="convert.py" output="screen" ns="$(arg ns)">
 		<param name="~use_amcl" type="bool" value="$(arg use_amcl)" />
 		<remap from="~pose_topic" to="pose" />
+		<remap from="~new_pose_topic" to="new_pose" />
 		<remap from="~odom_topic" to="odom" />
 		<remap from="~state_topic" to="state" />
 		<remap from="~mono16_depth_topic" to="realsense_loomo/depth" />

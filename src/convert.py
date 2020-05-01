@@ -17,6 +17,8 @@ class ConverterNode(object):
 		self.use_amcl = rospy.get_param("~use_amcl")
 		if not self.use_amcl:
 			self.listener = tf.TransformListener()
+		# Only useful when not using AMCL
+		self.new_pose_pub = rospy.Publisher("~new_pose_topic", PoseStamped, queue_size=1)
 
 		# Pose message to Odom messgae
 		self.pose_sub = rospy.Subscriber("~pose_topic", PoseStamped, self.pose_callback)
@@ -59,6 +61,8 @@ class ConverterNode(object):
 
 		self.state_pub.publish(state_msg)
 
+		self.new_pose_pub.publish(pose_msg)  # Only unique from other pose topic when not using AMCL
+
 	def tf_to_pose(self, source_frame, target_frame, header):
 		'''
 		Listening to transform and converting to Pose message.
@@ -70,6 +74,7 @@ class ConverterNode(object):
 		pose_msg = PoseStamped()
 		try:
 			trans, rot = self.listener.lookupTransform(target_frame, source_frame, rospy.Time(0))
+			pose_msg.header = header
 			pose_msg.pose.position.x = trans[0]
 			pose_msg.pose.position.y = trans[1]
 			pose_msg.pose.position.z = trans[2]
