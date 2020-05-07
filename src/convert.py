@@ -17,7 +17,7 @@ class ConverterNode(object):
 		self.use_amcl = rospy.get_param("~use_amcl")
 		if not self.use_amcl:
 			self.listener = tf.TransformListener()
-		# Only publishing when not using AMCL
+		# Only publishing non-redundant information when not using AMCL
 		self.new_pose_pub = rospy.Publisher("~new_pose_topic", PoseStamped, queue_size=1)
 		self.footprint_pub = rospy.Publisher("~footprint_topic", PolygonStamped, queue_size=1)
 
@@ -43,10 +43,13 @@ class ConverterNode(object):
 		:param pose_msg: (geometry_msgs/PoseStamped) pose message
 		'''
 		new_pose_msg, trans, rot = self.tf_to_pose("LO01_base_link", "map", pose_msg.header)
-		if not self.use_amcl and trans and rot:  # if not getting tf, trans and rot will be None
+		
+		if not self.use_amcl:
 			pose_msg = new_pose_msg
-			self.new_pose_pub.publish(pose_msg)
-
+		
+		self.new_pose_pub.publish(pose_msg)  # if using AMCL, this will be the same as the original pose message
+		
+		if trans and rot:  # if not getting tf, trans and rot will be None
 			footprint = PolygonStamped()
 			footprint.header = pose_msg.header  # has same frame_id (map) and time stamp
 			loomo_points = np.array([[0.16, -0.31],
