@@ -15,8 +15,8 @@ class ConverterNode(object):
 		# If using AMCL for tf from /map to /odom frame, use pose directly from pose_topic,
 		# otherwise have to subscribe to listen to transforms to get pose
 		self.use_amcl = rospy.get_param("~use_amcl")
-		if not self.use_amcl:
-			self.listener = tf.TransformListener()
+		
+		self.listener = tf.TransformListener()
 		# Only publishing non-redundant information when not using AMCL
 		self.new_pose_pub = rospy.Publisher("~new_pose_topic", PoseStamped, queue_size=1)
 		self.footprint_pub = rospy.Publisher("~footprint_topic", PolygonStamped, queue_size=1)
