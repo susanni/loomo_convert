@@ -1,10 +1,13 @@
 # Re-publishing Loomo topics for FASTER mapper #
 
-### Example sequence of commands to run with FASTER:
+### Example sequence of commands to run with [FASTER](https://github.com/mit-acl/faster):
 ```bash
 rosbag play --clock 2020-03-10-18-47-09.bag /LO01/realsense_loomo/depth/camera_info:=/LO01/realsense_loomo/camera_info
 roslaunch loomo_convert convert.launch
 roslaunch global_mapper_ros global_mapper_node.launch quad:=LO01 depth_image_topic:=realsense_loomo/depth_new_encoding pose_topic:=state goal_topic:=move_base_simple/goal odom_topic:=odom
+
+roslaunch faster faster_interface.launch quad:= LO01 is_ground_robot:=true
+roslaunch faster faster.launch quad:=LO01
 ```
 
 Notes:
