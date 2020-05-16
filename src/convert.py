@@ -37,6 +37,9 @@ class ConverterNode(object):
 		self.camera_info_sub = rospy.Subscriber("~camera_info_topic", CameraInfo, self.camera_info_callback)
 		self.camera_info_pub = rospy.Publisher("~updated_camera_info_topic", CameraInfo, queue_size=1)
 
+		self.last_state_time = None  # in nano seconds
+		self.last_state = None       # State message
+
 	def pose_callback(self, pose_msg):
 		'''
 		Uses a pose message to generate an odometry and state message.
@@ -70,6 +73,8 @@ class ConverterNode(object):
 		self.odom_pub.publish(odom_msg)
 		
 		state_msg = State()
+		state_msg.header = pose_msg.header
+		state_msg.state_stamp = pose_msg.header.stamp
 		state_msg.pos.x = pose_msg.pose.position.x
                 state_msg.pos.y = pose_msg.pose.position.y
                 state_msg.pos.z = pose_msg.pose.position.z
@@ -78,6 +83,15 @@ class ConverterNode(object):
                 state_msg.quat.y = pose_msg.pose.orientation.y
                 state_msg.quat.z = pose_msg.pose.orientation.z
                 state_msg.quat.w = pose_msg.pose.orientation.w
+
+		if self.last_state_time and self.last_state:
+			dt = pose_msg.header.stamp.nsecs - self.last_state_time
+			state_msg.vel.x = (state_msg.pos.x - self.last_state.pos.x)/(float(dt)/10**9)
+			state_msg.vel.y = (state_msg.pos.y - self.last_state.pos.y)/(float(dt)/10**9)
+			state_msg.vel.z = 0  # ground robot not traveling in z direction
+			
+		self.last_state_time = pose_msg.header.stamp.nsecs
+		self.last_state = state_msg
 
 		self.state_pub.publish(state_msg)
 
