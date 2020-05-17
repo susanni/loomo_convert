@@ -1,45 +1,47 @@
+<?xml version="1.0"?>
+
 <launch>
-	<arg name="ns" default="LO01" />
-	<arg name="use_amcl" default="false" />
-	<param name="/use_sim_time" value="true" />
+    <arg name="ns" default="LO01" />
+    <arg name="use_amcl" default="false" />
+    <param name="/use_sim_time" value="true" />
 
-	<!-- Static transforms to frames that are expected to exist by the mapper -->
-	<node pkg="tf" type="static_transform_publisher" name="world2map" args="0 0 0 0 0 0 world map 10" />
-	<node pkg="tf" type="static_transform_publisher" name="base2ns" args="0 0 0 0 0 0 $(arg ns)_base_link $(arg ns) 1" />
-	
-	<!-- FASTER planner expects camera frame -->
-	<node pkg="tf" type="static_transform_publisher" name="loomo2camera" args="0 0 0 0 0 0 $(arg ns)_rsdepth_center_neck_fix_frame $(arg ns)/camera 1" />
+    <!-- Static transforms to frames that are expected to exist by the mapper -->
+    <node pkg="tf" type="static_transform_publisher" name="world2map" args="0 0 0 0 0 0 world map 10" />
+    <node pkg="tf" type="static_transform_publisher" name="base2ns" args="0 0 0 0 0 0 $(arg ns)_base_link $(arg ns) 1" />
+    
+    <!-- FASTER planner expects camera frame -->
+    <node pkg="tf" type="static_transform_publisher" name="loomo2camera" args="0 0 0 0 0 0 $(arg ns)_rsdepth_center_neck_fix_frame $(arg ns)/camera 1" />
 
-	<!-- Depth point cloud has different coordinate system so this rotates the coordinate system so the depth is projecting in front of the Loomo, not onto the ceiling -->
-	<node pkg="tf" type="static_transform_publisher" name="camera2depth" args="0 0 0 -1.571 0 -1.571 $(arg ns)/camera $(arg ns)_rs_depth_optical_frame 1" />
+    <!-- Depth point cloud has different coordinate system so this rotates the coordinate system so the depth is projecting in front of the Loomo, not onto the ceiling -->
+    <node pkg="tf" type="static_transform_publisher" name="camera2depth" args="0 0 0 -1.571 0 -1.571 $(arg ns)/camera $(arg ns)_rs_depth_optical_frame 1" />
 
-	<!-- Converting data from Loomo topics to types required by FASTER mapper -->
-	<node name="loomo_convert" pkg="loomo_convert" type="convert.py" output="screen" ns="$(arg ns)">
-		<param name="~use_amcl" type="bool" value="$(arg use_amcl)" />
+    <!-- Converting data from Loomo topics to types required by FASTER mapper -->
+    <node name="loomo_convert" pkg="loomo_convert" type="convert.py" output="screen" ns="$(arg ns)">
+        <param name="~use_amcl" type="bool" value="$(arg use_amcl)" />
 
-		<!-- Subscribed topics -->
-		<remap from="~pose_topic" to="pose" />
-		<remap from="~mono16_depth_topic" to="realsense_loomo/depth" />
-		<remap from="~camera_info_topic" to="realsense_loomo/depth/camera_info" />
+        <!-- Subscribed topics -->
+        <remap from="~pose_topic" to="pose" />
+        <remap from="~mono16_depth_topic" to="realsense_loomo/depth" />
+        <remap from="~camera_info_topic" to="realsense_loomo/depth/camera_info" />
 
-		<!-- Published topics -->
-		<remap from="~new_pose_topic" to="new_pose" />
-		<remap from="~footprint_topic" to="footprint" />
-		<remap from="~odom_topic" to="odom" />
-		<remap from="~state_topic" to="state" />
-		<remap from="~final_depth_topic" to="realsense_loomo/depth_new_encoding" />
-		<remap from="~updated_camera_info_topic" to="realsense_loomo/camera_info" />
-	</node>
+        <!-- Published topics -->
+        <remap from="~new_pose_topic" to="new_pose" />
+        <remap from="~footprint_topic" to="footprint" />
+        <remap from="~odom_topic" to="odom" />
+        <remap from="~state_topic" to="state" />
+        <remap from="~final_depth_topic" to="realsense_loomo/depth_new_encoding" />
+        <remap from="~updated_camera_info_topic" to="realsense_loomo/camera_info" />
+    </node>
 
-	<!-- Visualize depth image as point cloud -->
-	<node pkg="nodelet" type="nodelet" name="standalone_nodelet" args="manager" output="screen" ns="$(arg ns)"/>
-        <node pkg="nodelet" type="nodelet" name="points_xyz" args="load depth_image_proc/point_cloud_xyz standalone_nodelet --no-bond" ns="$(arg ns)">
-		<!-- Subscribed topics -->
-                <remap from="camera_info" to="realsense_loomo/camera_info"/>
-		<remap from="image_rect" to="realsense_loomo/depth_new_encoding"/>
+    <!-- Visualize depth image as point cloud -->
+    <node pkg="nodelet" type="nodelet" name="standalone_nodelet" args="manager" output="screen" ns="$(arg ns)"/>
+    <node pkg="nodelet" type="nodelet" name="points_xyz" args="load depth_image_proc/point_cloud_xyz standalone_nodelet --no-bond" ns="$(arg ns)">
+        <!-- Subscribed topics -->
+        <remap from="camera_info" to="realsense_loomo/camera_info"/>
+        <remap from="image_rect" to="realsense_loomo/depth_new_encoding"/>
 
-		<!-- Published topics -->
-		<remap from="points" to="realsense_loomo/points"/>
-        </node>
+        <!-- Published topics -->
+        <remap from="points" to="realsense_loomo/points"/>
+    </node>
 
 </launch>
