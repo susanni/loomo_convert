@@ -2,6 +2,8 @@
 
 """
 This script creates a new bag by modifying/deleting transforms from a given bag file
+Once you set the input and output bag file names in this script, run:
+python replace_tf.py
 
 If you just want to remove certain tfs or topics, you can use the `rosbag filter` command:
 
@@ -18,11 +20,6 @@ from geometry_msgs.msg import Vector3, Quaternion, TransformStamped, Transform
 from tf2_msgs.msg import TFMessage
 import tf
 from tqdm import tqdm
-
-# Save new bag in same place as old bag, with '_notf' appended
-# bagName = '/home/swarm/Desktop/2020-03-10-18-47-09.bag'
-# bagInName = bagName
-# bagOutName = bagName.split('.')[0] + '_notf' + '.bag'
 
 ## Hard code the bag in and bag out paths
 bagInName = '/home/swarm/Desktop/2020-03-10-18-47-09.bag'
