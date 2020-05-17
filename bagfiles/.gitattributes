@@ -1,0 +1,2 @@
+2020-03-10-18-47-09.bag filter=lfs diff=lfs merge=lfs -text
+loomo_simple.bag filter=lfs diff=lfs merge=lfs -text
