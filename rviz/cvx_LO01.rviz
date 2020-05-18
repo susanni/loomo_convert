@@ -25,7 +25,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: LaserScan
+    SyncSource: ""
   - Class: rviz/Displays
     Help Height: 0
     Name: Displays
@@ -132,84 +132,13 @@ Visualization Manager:
       Frame Timeout: 1000
       Frames:
         All Enabled: false
-        LO01:
-          Value: true
-        LO01/camera:
-          Value: true
-        LO01_base_center_ground_frame:
-          Value: true
-        LO01_base_footprint:
-          Value: true
-        LO01_base_link:
-          Value: true
-        LO01_front_gimbal:
-          Value: true
-        LO01_head_center_neck_pitch_frame:
-          Value: true
-        LO01_neck_center_body_internal_frame:
-          Value: true
-        LO01_neck_center_body_yaw_frame:
-          Value: true
-        LO01_odom:
-          Value: true
-        LO01_platform_center_head_fix_frame:
-          Value: true
-        LO01_realsense_front_middle_gimbal_link:
-          Value: true
-        LO01_rplidar_gimbal:
-          Value: true
-        LO01_rs_depth_optical_frame:
-          Value: true
-        LO01_rscolor_center_neck_fix_frame:
-          Value: true
-        LO01_rsdepth_center_neck_fix_frame:
-          Value: true
-        map:
-          Value: true
-        map_0:
-          Value: true
-        map_1:
-          Value: true
-        map_2:
-          Value: true
-        world:
-          Value: true
       Marker Scale: 2
       Name: TF
       Show Arrows: true
       Show Axes: true
       Show Names: false
       Tree:
-        world:
-          map:
-            LO01_odom:
-              LO01_base_link:
-                LO01:
-                  {}
-                LO01_base_center_ground_frame:
-                  LO01_neck_center_body_internal_frame:
-                    LO01_neck_center_body_yaw_frame:
-                      LO01_head_center_neck_pitch_frame:
-                        LO01_platform_center_head_fix_frame:
-                          {}
-                      LO01_rscolor_center_neck_fix_frame:
-                        {}
-                      LO01_rsdepth_center_neck_fix_frame:
-                        LO01/camera:
-                          LO01_rs_depth_optical_frame:
-                            {}
-                LO01_base_footprint:
-                  LO01_front_gimbal:
-                    LO01_realsense_front_middle_gimbal_link:
-                      {}
-                    LO01_rplidar_gimbal:
-                      {}
-            map_0:
-              {}
-            map_1:
-              {}
-            map_2:
-              {}
+        {}
       Update Interval: 0
       Value: true
     - Alpha: 1
@@ -324,7 +253,7 @@ Visualization Manager:
       Buffer Length: 1
       Class: rviz/Path
       Color: 255; 0; 0
-      Enabled: true
+      Enabled: false
       Head Diameter: 0.300000012
       Head Length: 0.200000003
       Length: 0.300000012
@@ -342,12 +271,12 @@ Visualization Manager:
       Shaft Length: 0.100000001
       Topic: /LO01/faster/traj_whole
       Unreliable: false
-      Value: true
+      Value: false
     - Alpha: 1
       Buffer Length: 1
       Class: rviz/Path
       Color: 85; 0; 255
-      Enabled: true
+      Enabled: false
       Head Diameter: 0.300000012
       Head Length: 0.200000003
       Length: 0.300000012
@@ -365,7 +294,7 @@ Visualization Manager:
       Shaft Length: 0.100000001
       Topic: /LO01/faster/traj_safe
       Unreliable: false
-      Value: true
+      Value: false
     - Class: rviz/MarkerArray
       Enabled: false
       Marker Topic: /LO01/faster/traj_committed_colored
@@ -375,13 +304,13 @@ Visualization Manager:
       Queue Size: 100
       Value: false
     - Class: rviz/MarkerArray
-      Enabled: false
+      Enabled: true
       Marker Topic: /LO01/faster/traj_whole_colored
       Name: Whole_Color
       Namespaces:
         {}
       Queue Size: 100
-      Value: false
+      Value: true
     - Class: rviz/MarkerArray
       Enabled: false
       Marker Topic: /LO01/faster/traj_safe_colored
@@ -551,5 +480,5 @@ Window Geometry:
   Views:
     collapsed: true
   Width: 1323
-  X: 65
-  Y: 24
+  X: 75
+  Y: 34
